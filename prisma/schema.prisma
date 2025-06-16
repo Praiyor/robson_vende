@@ -8,3 +8,45 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model vendaSimples {
+  id     Int   @id @default(autoincrement())
+  preco  Float
+  item   item  @relation(fields: [itemId], references: [id])
+  itemId Int   @unique
+}
+
+model vendaLeilao {
+  id     Int      @id @default(autoincrement())
+  inicio DateTime
+  fim    DateTime
+  preco  Float
+  lances Int      @default(0)
+  item   item     @relation(fields: [itemId], references: [id])
+  itemId Int      @unique
+}
+
+model item {
+  id           Int           @id @default(autoincrement())
+  deck         deck?         @relation(fields: [deckId], references: [id])
+  card         card?         @relation(fields: [cardId], references: [id])
+  deckId       Int?          @unique
+  cardId       Int?          @unique
+  vendaSimples vendaSimples?
+  vendaLeilao  vendaLeilao?
+}
+
+model deck {
+  id          Int     @id
+  name        String
+  description String?
+  deckSize    Int
+  item        item?   @relation
+}
+
+model card {
+  id          Int    @id
+  name        String
+  description String
+  item        item?  @relation
+}
