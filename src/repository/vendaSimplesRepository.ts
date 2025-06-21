@@ -3,10 +3,14 @@ import { vendaSimplesRepositoryInterface } from "./interface/vendaSimplesReposit
 import { prisma } from "../main/config/prisma";
 
 export class vendaSimplesRepository implements vendaSimplesRepositoryInterface {
-    async create(vendaSimples: any): Promise<vendaSimples> 
+    async create(vendaSimples: Omit<vendaSimples, 'id' | 'item' | 'itemId'>, iItemId: number): Promise<vendaSimples> 
     {
         const vendaCreated = await prisma.vendaSimples.create({
-            data: vendaSimples
+            data: {
+                ...vendaSimples,
+                item: {
+                    connect: { id: iItemId}
+                }}
         });
             
         return vendaCreated;
@@ -17,19 +21,34 @@ export class vendaSimplesRepository implements vendaSimplesRepositoryInterface {
         return await prisma.vendaSimples.findMany();
     }
 
-    findById(vendaSimplesId: number): Promise<vendaSimples | null> 
+    async findById(vendaSimplesId: number): Promise<vendaSimples | null> 
     {
-        throw new Error("Method not implemented.");
+        return await prisma.vendaSimples.findUnique({
+            where: {
+                id: vendaSimplesId
+            }, include: {
+                item: true
+            }
+        });
     }
 
-    deleteById(vendaSimplesId: number): Promise<void> 
+    async deleteById(vendaSimplesId: number): Promise<void> 
     {
-        throw new Error("Method not implemented.");
+        await prisma.vendaSimples.delete({
+            where: {
+                id: vendaSimplesId
+            }
+        });
     }
     
-    updateById(vendaSimplesId: number, vendaSimplesData: any): Promise<vendaSimples | null> 
+    async updateById(vendaSimplesId: number, vendaSimplesData: Partial<vendaSimples>): Promise<vendaSimples | null> 
     {
-        throw new Error("Method not implemented.");
+        return await prisma.vendaSimples.update({
+            where: {
+                id: vendaSimplesId
+            },
+            data: vendaSimplesData,
+        })
     }
 
 }

@@ -3,9 +3,18 @@ import { vendaLeilao } from "../main/generated/prisma";
 import { vendaLeilaoRepositoryInterface } from "./interface/vendaLeilaoRepositoryInterface";
 
 export class vendaLeilaoRepository implements vendaLeilaoRepositoryInterface {
-    create(vendaLeilao: any): Promise<vendaLeilao> 
+    async create(vendaLeilao: Omit<vendaLeilao, 'id' | 'item' | 'itemId'>, iItemId: number): Promise<vendaLeilao> 
     {
-        throw new Error("Method not implemented.");
+        const vendaCreated = await prisma.vendaLeilao.create({
+            data: {
+                ...vendaLeilao,
+                item: {
+                    connect: { id: iItemId}
+                }
+            }
+        });
+
+        return vendaCreated;
     }
 
     async findAll(): Promise<vendaLeilao[]> 
@@ -13,19 +22,34 @@ export class vendaLeilaoRepository implements vendaLeilaoRepositoryInterface {
         return await prisma.vendaLeilao.findMany();
     }
 
-    findById(vendaLeilaoId: number): Promise<vendaLeilao | null> 
+    async findById(vendaLeilaoId: number): Promise<vendaLeilao | null> 
     {
-        throw new Error("Method not implemented.");
+        return await prisma.vendaLeilao.findUnique({
+            where: {
+                id: vendaLeilaoId
+            }, include: {
+                item: true
+            }
+        });
     }
 
-    deleteById(vendaLeilaoId: number): Promise<void> 
+    async deleteById(vendaLeilaoId: number): Promise<void> 
     {
-        throw new Error("Method not implemented.");
+        await prisma.vendaLeilao.delete({
+            where: {
+                id: vendaLeilaoId
+            }
+        })
     }
 
-    updateById(vendaLeilaoId: number, vendaLeilaoData: any): Promise<vendaLeilao | null> 
+    async updateById(vendaLeilaoId: number, vendaLeilaoData: any): Promise<vendaLeilao | null> 
     {
-        throw new Error("Method not implemented.");
+        return await prisma.vendaLeilao.update({
+            where: {
+                id: vendaLeilaoId
+            },
+            data: vendaLeilaoData,
+        })
     }
     
 }
