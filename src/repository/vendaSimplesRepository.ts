@@ -3,6 +3,7 @@ import { vendaSimplesRepositoryInterface } from "./interface/vendaSimplesReposit
 import { prisma } from "../main/config/prisma";
 
 export class vendaSimplesRepository implements vendaSimplesRepositoryInterface {
+    constructor(){}
     async create(vendaSimples: Omit<vendaSimples, 'id' | 'item' | 'itemId'>, iItemId: number): Promise<vendaSimples> 
     {
         const vendaCreated = await prisma.vendaSimples.create({

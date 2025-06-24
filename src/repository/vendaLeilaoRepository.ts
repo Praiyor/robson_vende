@@ -3,6 +3,7 @@ import { vendaLeilao } from "../main/generated/prisma";
 import { vendaLeilaoRepositoryInterface } from "./interface/vendaLeilaoRepositoryInterface";
 
 export class vendaLeilaoRepository implements vendaLeilaoRepositoryInterface {
+    constructor(){}
     async create(vendaLeilao: Omit<vendaLeilao, 'id' | 'item' | 'itemId'>, iItemId: number): Promise<vendaLeilao> 
     {
         const vendaCreated = await prisma.vendaLeilao.create({

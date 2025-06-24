@@ -3,6 +3,12 @@ import { vendaLeilaoRepositoryInterface } from "../repository/interface/vendaLei
 import { vendaLeilaoRepository } from "../repository/vendaLeilaoRepository";
 import { vendaLeilaoIdParamSchema, vendaLeilaoPartialSchema, vendaLeilaoSchema } from './schema/vendaLeilaoSchema';
 import { vendaLeilao } from '../main/generated/prisma/index';
+import { cardRepositoryInterface } from "../repository/interface/cardRepositoryInterface";
+import { deckRepositoryInterface } from "../repository/interface/deckRepositoryInterface";
+import { itemRepositoryInterface } from "../repository/interface/itemRepositoryInterface";
+import { itemRepository } from "../repository/itemRepository";
+import { deckRepository } from "../repository/deckRepository";
+import { cardRepository } from "../repository/cardRepository";
 
 export class vendaLeilaoController {
     constructor(){}
@@ -92,5 +98,17 @@ export class vendaLeilaoController {
 
     static getVendaLeilaoRepository(): vendaLeilaoRepositoryInterface{
         return new vendaLeilaoRepository();
+    }
+
+    static getItemRepository(): itemRepositoryInterface{
+        return new itemRepository();
+    }
+
+    static getDeckRepository(): deckRepositoryInterface{
+        return new deckRepository();
+    }
+
+    static getCardRepository(): cardRepositoryInterface{
+        return new cardRepository();
     }
 }

@@ -1,10 +1,12 @@
 import { prisma } from "../main/config/prisma";
 import { deck } from "../main/generated/prisma";
+import { deckDTO } from "../utils/dto/deckDTO";
 import { deckRepositoryInterface } from "./interface/deckRepositoryInterface";
 
 export class deckRepository implements deckRepositoryInterface 
 {
-    async create(deck: any): Promise<deck> {
+    constructor(){}
+    async create(deck: deckDTO): Promise<deck> {
         const deckCreated = await prisma.deck.create({
             data: deck
         })

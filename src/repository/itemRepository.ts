@@ -1,21 +1,21 @@
 import { prisma } from "../main/config/prisma";
 import { item } from "../main/generated/prisma";
+import { itemDTO } from "../utils/dto/itemDTO";
 import { ItemRelationTypeEnum } from "../utils/enum/enums";
-import { ItemRelationType } from "../utils/types/types";
 import { itemRepositoryInterface } from "./interface/itemRepositoryInterface";
 
 export class itemRepository implements itemRepositoryInterface {
-    async create(itemData: Partial<item>, iRelationId: number, relationType: ItemRelationType): Promise<item> 
+    constructor(){}
+    async create(dto: itemDTO): Promise<item> 
     {
-        let data: any = { ...itemData};
-        if(relationType === ItemRelationTypeEnum.DECK){
-            data.deck = { connect: {id: iRelationId}};
-        }
-        else if(relationType === ItemRelationTypeEnum.CARD){
-            data.card = { connect: {id: iRelationId}};
-        } else{ throw new Error("Invalid relation type"); }
+        const { relationId, relationType } = dto;
 
-        return prisma.item.create({ data: data})
+        const data =
+            relationType === ItemRelationTypeEnum.DECK
+                ? { deck: { connect: { id: relationId } } }
+                : { card: { connect: { id: relationId } } };
+
+        return prisma.item.create({ data: data })
     }
 
     async findAll(): Promise<item[]> 

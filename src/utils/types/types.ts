@@ -1,1 +1,0 @@
-export type ItemRelationType = 'deck' | 'card';

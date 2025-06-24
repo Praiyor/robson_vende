@@ -1,4 +1,8 @@
-export interface BaseUsecaseInterface<Args extends any[] = any[], Output = any> {
-    execute(...args: Args): Promise<Output>;
-    validate(...args: Args): void;
+export interface BaseUsecaseInterface<
+  ExecuteArgs extends any[] = any[],
+  Output = any,
+  ValidateArgs extends any[] = ExecuteArgs
+> {
+  execute(...args: ExecuteArgs): Promise<Output>;
+  validate(...args: ValidateArgs): void;
 }

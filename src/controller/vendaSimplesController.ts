@@ -5,6 +5,12 @@ import { CreateVendaSimplesUsecase } from "../usecase/VendaSimples/CreateVendaSi
 import { vendaSimplesSchema, vendaSimplesIdParamSchema } from "./schema/vendaSimplesSchema";
 import { vendaSimples } from "../main/generated/prisma";
 import { vendaSimplesDTO } from "../utils/dto/vendaSimplesDTO";
+import { itemRepositoryInterface } from "../repository/interface/itemRepositoryInterface";
+import { itemRepository } from "../repository/itemRepository";
+import { deckRepositoryInterface } from "../repository/interface/deckRepositoryInterface";
+import { deckRepository } from "../repository/deckRepository";
+import { cardRepositoryInterface } from "../repository/interface/cardRepositoryInterface";
+import { cardRepository } from "../repository/cardRepository";
 
 export class vendaSimplesController {
     constructor(){}
@@ -21,7 +27,10 @@ export class vendaSimplesController {
             const { preco, deckId, cardId } = parseResult.data;
             const vendaData: vendaSimplesDTO = { preco, deckId, cardId };
 
-            const createVenda = new CreateVendaSimplesUsecase(vendaSimplesController.getVendaSimplesRepository());
+            const createVenda = new CreateVendaSimplesUsecase(vendaSimplesController.getVendaSimplesRepository(),
+                                                            vendaSimplesController.getItemRepository(),
+                                                            vendaSimplesController.getDeckRepository(),
+                                                            vendaSimplesController.getCardRepository());
 
             const createdVenda:vendaSimples = await createVenda.execute(vendaData);
 
@@ -99,5 +108,17 @@ export class vendaSimplesController {
 
     static getVendaSimplesRepository(): vendaSimplesRepositoryInterface{
         return new vendaSimplesRepository();
+    }
+
+    static getItemRepository(): itemRepositoryInterface{
+        return new itemRepository();
+    }
+
+    static getDeckRepository(): deckRepositoryInterface{
+        return new deckRepository();
+    }
+
+    static getCardRepository(): cardRepositoryInterface{
+        return new cardRepository();
     }
 }
