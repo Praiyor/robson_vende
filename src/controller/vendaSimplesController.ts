@@ -11,6 +11,7 @@ import { deckRepositoryInterface } from "../repository/interface/deckRepositoryI
 import { deckRepository } from "../repository/deckRepository";
 import { cardRepositoryInterface } from "../repository/interface/cardRepositoryInterface";
 import { cardRepository } from "../repository/cardRepository";
+import { GetAllVendaSimplesUseCase } from "../usecase/VendaSimples/GetAllVendaSimplesUsecase";
 
 export class vendaSimplesController {
     constructor(){}
@@ -48,7 +49,7 @@ export class vendaSimplesController {
     static async getAllVendaSimples(req: Request, res: Response)
     {
         try {
-            const getAllVendaSimplesUsecase = new GetAllVendaSimplesUsecase(vendaSimplesController.getVendaSimplesRepository());
+            const getAllVendaSimplesUsecase = new GetAllVendaSimplesUseCase(vendaSimplesController.getVendaSimplesRepository());
             const vendas: vendaSimples[] = await getAllVendaSimplesUsecase.execute();
             
             res.status(200).json(vendas);
