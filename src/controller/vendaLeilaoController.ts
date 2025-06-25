@@ -9,6 +9,8 @@ import { itemRepositoryInterface } from "../repository/interface/itemRepositoryI
 import { itemRepository } from "../repository/itemRepository";
 import { deckRepository } from "../repository/deckRepository";
 import { cardRepository } from "../repository/cardRepository";
+import { CreateVendaLeilaoUsecase } from "../usecase/VendaLeilao/CreateVendaLeilaoUsecase";
+import { GetAllVendaLeilaoUseCase } from "../usecase/VendaLeilao/GetAllVendaLeilaoUsecase";
 
 export class vendaLeilaoController {
     constructor(){}
@@ -24,7 +26,10 @@ export class vendaLeilaoController {
             const { preco, inicio, fim, deckId, cardId } = parseResult.data;
             const vendaLeilaoData = { preco, inicio, fim, deckId, cardId };
 
-            const createVendaLeilao = new CreateVendaLeilaoUsecase(vendaLeilaoController.getVendaLeilaoRepository());
+            const createVendaLeilao = new CreateVendaLeilaoUsecase(vendaLeilaoController.getVendaLeilaoRepository(),
+                                                                vendaLeilaoController.getItemRepository(),
+                                                                vendaLeilaoController.getDeckRepository(),
+                                                                vendaLeilaoController.getCardRepository());
             const createdVenda = await createVendaLeilao.execute(vendaLeilaoData);
             
             if(!createdVenda){
@@ -39,7 +44,7 @@ export class vendaLeilaoController {
 
     static async getAllVendaLeilao(req: Request, res: Response){
         try {
-            const getAllVendaLeilaoUsecase = new GetAllVendaLeilaoUsecase(vendaLeilaoController.getVendaLeilaoRepository());
+            const getAllVendaLeilaoUsecase = new GetAllVendaLeilaoUseCase(vendaLeilaoController.getVendaLeilaoRepository());
             const vendas: vendaLeilao[] = await getAllVendaLeilaoUsecase.execute();
 
             res.status(200).json(vendas);

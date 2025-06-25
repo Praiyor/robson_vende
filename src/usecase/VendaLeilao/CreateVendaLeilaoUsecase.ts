@@ -1,6 +1,4 @@
-import { vendaSimples } from "../../main/generated/prisma";
-import { vendaSimplesDTO } from "../../utils/dto/vendaSimplesDTO";
-import { vendaSimplesRepositoryInterface } from '../../repository/interface/vendaSimplesRepositoryInterface';
+import { vendaLeilao } from "../../main/generated/prisma";
 import { BaseUsecaseInterface } from "../interface/BaseUsecaseInterface";
 import { itemRepositoryInterface } from "../../repository/interface/itemRepositoryInterface";
 import { deckRepositoryInterface } from "../../repository/interface/deckRepositoryInterface";
@@ -9,28 +7,32 @@ import { CreateDeckUsecase } from "../Deck/CreateDeckUsecase";
 import { ItemRelationTypeEnum } from "../../utils/enum/enums";
 import { CreateCardUsecase } from "../Card/CreateCardUsecase";
 import { CreateItemUsecase } from "../Item/CreateItemUsecase";
+import { vendaLeilaoRepositoryInterface } from "../../repository/interface/vendaLeilaoRepositoryInterface";
+import { vendaLeilaoDTO } from "../../utils/dto/vendaLeilaoDTO";
 
-export class CreateVendaSimplesUsecase implements BaseUsecaseInterface<[vendaSimplesDTO], vendaSimples>{
+export class CreateVendaLeilaoUsecase implements BaseUsecaseInterface<[vendaLeilaoDTO], vendaLeilao>{
 
-    constructor(private vendaSimplesRepository: vendaSimplesRepositoryInterface,
+    constructor(private vendaLeilaoRepository: vendaLeilaoRepositoryInterface,
                 private itemRepository: itemRepositoryInterface,
                 private deckRepository: deckRepositoryInterface,
                 private cardRepository: cardRepositoryInterface
     ) {}
 
-    async execute(vendaSimplesData: vendaSimplesDTO): Promise<vendaSimples> {
-        this.validate(vendaSimplesData);
+    async execute(vendaLeilaoData: vendaLeilaoDTO): Promise<vendaLeilao> {
+        this.validate(vendaLeilaoData);
 
-        const { relationId, relationType } = await this.createRelatedEntity(vendaSimplesData);
+        const { relationId, relationType } = await this.createRelatedEntity(vendaLeilaoData);
 
         const createItemUsecase = new CreateItemUsecase(this.itemRepository);
         const item = await createItemUsecase.execute({relationId, relationType});
 
-        const vendaSimplesCreated = await this.vendaSimplesRepository.create({ preco: vendaSimplesData.preco }, item.id);
-        return vendaSimplesCreated;
+        const vendaLeilaoCreated = await this.vendaLeilaoRepository.create({ inicio: vendaLeilaoData.inicio,
+                                                                             fim: vendaLeilaoData.fim, 
+                                                                             preco: vendaLeilaoData.preco }, item.id);
+        return vendaLeilaoCreated;
     }
 
-    validate(data: vendaSimplesDTO){
+    validate(data: vendaLeilaoDTO){
         if (!data || !data.preco) {
             throw new Error("Invalid data provided for Venda Simples creation");
         }
@@ -38,12 +40,17 @@ export class CreateVendaSimplesUsecase implements BaseUsecaseInterface<[vendaSim
         if (!!data.deckId === !!data.cardId) {
         throw new Error("Must pass only a Deck or a Card, not both or neither");
         }
-        
+
+        if (new Date(data.inicio) >= new Date(data.fim)) {
+          throw new Error("The begining date must be before the ending date");
+        }
+
         if (data.preco < 0) {
           throw new Error("The price must be positive");
         }
     }
-    private async createRelatedEntity(data: vendaSimplesDTO): Promise<{ relationId: number; relationType: ItemRelationTypeEnum }> {
+
+    private async createRelatedEntity(data: vendaLeilaoDTO): Promise<{ relationId: number; relationType: ItemRelationTypeEnum }> {
         if (data.deckId) {
             const deckCreated = await new CreateDeckUsecase(this.deckRepository).execute(data.deckId);
             return { relationId: deckCreated.id, relationType: ItemRelationTypeEnum.DECK };
@@ -52,5 +59,4 @@ export class CreateVendaSimplesUsecase implements BaseUsecaseInterface<[vendaSim
             return { relationId: cardCreated.id, relationType: ItemRelationTypeEnum.CARD };
         }
     }
-    
 }
