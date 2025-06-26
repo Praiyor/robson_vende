@@ -11,6 +11,8 @@ import { deckRepository } from "../repository/deckRepository";
 import { cardRepository } from "../repository/cardRepository";
 import { CreateVendaLeilaoUsecase } from "../usecase/VendaLeilao/CreateVendaLeilaoUsecase";
 import { GetAllVendaLeilaoUseCase } from "../usecase/VendaLeilao/GetAllVendaLeilaoUsecase";
+import { GetVendaLeilaoByIdUseCase } from "../usecase/VendaLeilao/GetVendaLeilaoByIdUsecase";
+import { DeleteVendaLeilaoByIdUseCase } from "../usecase/VendaLeilao/DeleteVendaLeilaoByIdUsecase";
 
 export class vendaLeilaoController {
     constructor(){}
@@ -59,8 +61,12 @@ export class vendaLeilaoController {
             if(!vendaLeilaoId){
                 throw new Error("Venda Leilão ID is required");
             }
-            const getVendaLeilaoByIdUsecase = new GetVendaLeilaoByIdUsecase(vendaLeilaoController.getVendaLeilaoRepository());
+            const getVendaLeilaoByIdUsecase = new GetVendaLeilaoByIdUseCase(vendaLeilaoController.getVendaLeilaoRepository());
             const venda: vendaLeilao | null = await getVendaLeilaoByIdUsecase.execute(vendaLeilaoId);
+
+            if(!venda){
+                throw new Error("venda not found");
+            }
 
             res.status(200).json(venda);
         } catch (error) {
@@ -74,7 +80,7 @@ export class vendaLeilaoController {
             if(!vendaLeilaoId){
                 throw new Error("Venda Leilão ID is required");
             }
-            const deleteVendaLeilaoUsecase = new DeleteVendaLeilaoByIdUsecase(vendaLeilaoController.getVendaLeilaoRepository());
+            const deleteVendaLeilaoUsecase = new DeleteVendaLeilaoByIdUseCase(vendaLeilaoController.getVendaLeilaoRepository());
             await deleteVendaLeilaoUsecase.execute(vendaLeilaoId);
 
             res.status(200).json({ message: "Venda Leilão deleted successfully" });

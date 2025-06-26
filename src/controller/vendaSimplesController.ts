@@ -12,6 +12,8 @@ import { deckRepository } from "../repository/deckRepository";
 import { cardRepositoryInterface } from "../repository/interface/cardRepositoryInterface";
 import { cardRepository } from "../repository/cardRepository";
 import { GetAllVendaSimplesUseCase } from "../usecase/VendaSimples/GetAllVendaSimplesUsecase";
+import { GetVendaSimplesByIdUseCase } from "../usecase/VendaSimples/GetVendaSimplesByIdUsecase";
+import { DeleteVendaSimplesByIdUseCase } from "../usecase/VendaSimples/DeleteVendaSimplesByIdUsecase";
 
 export class vendaSimplesController {
     constructor(){}
@@ -65,8 +67,12 @@ export class vendaSimplesController {
             if(!vendaSimplesId){
                 throw new Error("Venda Simples ID is required");
             }
-            const getVendaSimplesByIdUsecase = new GetVendaSimplesByIdUsecase(vendaSimplesController.getVendaSimplesRepository());
+            const getVendaSimplesByIdUsecase = new GetVendaSimplesByIdUseCase(vendaSimplesController.getVendaSimplesRepository());
             const venda: vendaSimples | null = await getVendaSimplesByIdUsecase.execute(vendaSimplesId);
+
+            if(!venda){
+                throw new Error("venda not found");
+            }
 
             res.status(200).json(venda);
         } catch (error) {
@@ -79,7 +85,7 @@ export class vendaSimplesController {
         try {
             const {vendaSimplesId} = vendaSimplesIdParamSchema.parse(req.params);
 
-            const deleteVendaSimplesUsecase = new DeleteVendaSimplesByIdUsecase(vendaSimplesController.getVendaSimplesRepository());
+            const deleteVendaSimplesUsecase = new DeleteVendaSimplesByIdUseCase(vendaSimplesController.getVendaSimplesRepository());
             await deleteVendaSimplesUsecase.execute(vendaSimplesId);
 
             res.status(200).json({ message: "Venda Simples deleted successfully" });
