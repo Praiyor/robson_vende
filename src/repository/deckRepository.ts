@@ -8,7 +8,13 @@ export class deckRepository implements deckRepositoryInterface
     constructor(){}
     async create(deck: deckDTO): Promise<deck> {
         const deckCreated = await prisma.deck.create({
-            data: deck
+            data: {
+                id: deck.id,
+                name: deck.name,
+                description: deck.description,
+                deckSize: deck.deckSize,
+                item: { connect: { id: deck.itemId } }
+            },
         })
 
         return deckCreated;

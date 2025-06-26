@@ -9,11 +9,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model item {
+  id             Int           @id @default(autoincrement())
+  vendaSimples   vendaSimples? @relation(fields: [vendaSimplesId], references: [id], onDelete: Cascade)
+  vendaSimplesId Int?          @unique
+
+  vendaLeilao   vendaLeilao? @relation(fields: [vendaLeilaoId], references: [id], onDelete: Cascade)
+  vendaLeilaoId Int?         @unique
+
+  deck deck?
+  card card?
+}
+
 model vendaSimples {
-  id     Int   @id @default(autoincrement())
+  id     Int    @id @default(autoincrement())
   preco  Float
-  item   item  @relation(fields: [itemId], references: [id])
-  itemId Int   @unique
+  status String
+  item   item?
 }
 
 model vendaLeilao {
@@ -21,19 +33,9 @@ model vendaLeilao {
   inicio DateTime
   fim    DateTime
   preco  Float
+  status String
   lances Int      @default(0)
-  item   item     @relation(fields: [itemId], references: [id])
-  itemId Int      @unique
-}
-
-model item {
-  id           Int           @id @default(autoincrement())
-  deck         deck?         @relation(fields: [deckId], references: [id])
-  card         card?         @relation(fields: [cardId], references: [id])
-  deckId       Int?          @unique
-  cardId       Int?          @unique
-  vendaSimples vendaSimples?
-  vendaLeilao  vendaLeilao?
+  item   item?
 }
 
 model deck {
@@ -41,12 +43,14 @@ model deck {
   name        String
   description String?
   deckSize    Int
-  item        item?   @relation
+  itemId      Int     @unique
+  item        item    @relation(fields: [itemId], references: [id], onDelete: Cascade)
 }
 
 model card {
   id          Int    @id
   name        String
   description String
-  item        item?  @relation
+  itemId      Int    @unique
+  item        item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
 }

@@ -3,30 +3,29 @@ import { BaseUsecaseInterface } from "../interface/BaseUsecaseInterface";
 import { item } from "../../main/generated/prisma";
 import { itemRepositoryInterface } from "../../repository/interface/itemRepositoryInterface";
 import { itemDTO } from "../../utils/dto/itemDTO";
+import { ItemRelationTypeEnum } from "../../utils/enum/enums";
 
 export class CreateItemUsecase implements BaseUsecaseInterface<[itemDTO], item>{
     constructor( private itemRepository: itemRepositoryInterface ) {}
 
-    async execute(itemData: itemDTO): Promise<item>{
-        await this.validate(itemData);
-        const itemCreated = await this.itemRepository.create(itemData)
+    async execute(dto: itemDTO): Promise<item>{
+        await this.validate(dto);
+        const itemCreated = await this.itemRepository.create(dto);
         return itemCreated;
     }
 
-    async validate(itemData: itemDTO){
-        const { relationId, relationType } = itemData;
-
-        if (!relationType) {
-        throw new Error("Relation type must be provided (DECK or CARD).");
+    async validate(dto: itemDTO){
+        if (!dto || !dto.relationId || !dto.relationType) {
+          throw new Error("Invalid params to create the item");
         }
-
-        if (!relationId || typeof relationId !== 'number' || relationId <= 0) {
-        throw new Error("A valid relation ID must be provided.");
-        }
-        
-        const validTypes = ["DECK", "CARD"];
-        if (!validTypes.includes(relationType.toUpperCase())) {
-            throw new Error("Invalid relation type. Must be either 'DECK' or 'CARD'.");
+    
+        const validTypes = [
+          ItemRelationTypeEnum.VENDA_SIMPLES,
+          ItemRelationTypeEnum.VENDA_LEILAO,
+        ];
+    
+        if (!validTypes.includes(dto.relationType)) {
+          throw new Error("relationType must be VENDA_SIMPLES or VENDA_LEILAO");
         }
     }
 }

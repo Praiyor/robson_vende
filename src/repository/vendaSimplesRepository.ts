@@ -4,14 +4,12 @@ import { prisma } from "../main/config/prisma";
 
 export class vendaSimplesRepository implements vendaSimplesRepositoryInterface {
     constructor(){}
-    async create(vendaSimplesData: Omit<vendaSimples, 'id' | 'item' | 'itemId'>, iItemId: number): Promise<vendaSimples> 
+    async create(vendaSimplesData: Omit<vendaSimples, 'id' | 'item' | 'itemId'>): Promise<vendaSimples> 
     {
         const vendaCreated = await prisma.vendaSimples.create({
             data: {
                 preco: vendaSimplesData.preco,
-                item: {
-                    connect: { id: iItemId }
-                }
+                status: vendaSimplesData.status
             }
         });
             

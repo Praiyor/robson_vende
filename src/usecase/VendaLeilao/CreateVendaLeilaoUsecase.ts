@@ -21,14 +21,16 @@ export class CreateVendaLeilaoUsecase implements BaseUsecaseInterface<[vendaLeil
     async execute(vendaLeilaoData: vendaLeilaoDTO): Promise<vendaLeilao> {
         this.validate(vendaLeilaoData);
 
-        const { relationId, relationType } = await this.createRelatedEntity(vendaLeilaoData);
-
-        const createItemUsecase = new CreateItemUsecase(this.itemRepository);
-        const item = await createItemUsecase.execute({relationId, relationType});
-
         const vendaLeilaoCreated = await this.vendaLeilaoRepository.create({ inicio: vendaLeilaoData.inicio,
                                                                              fim: vendaLeilaoData.fim, 
-                                                                             preco: vendaLeilaoData.preco }, item.id);
+                                                                             preco: vendaLeilaoData.preco,
+                                                                             status: "A venda" });
+
+        const createItemUsecase = new CreateItemUsecase(this.itemRepository);
+        const item = await createItemUsecase.execute({relationId: vendaLeilaoCreated.id , relationType: ItemRelationTypeEnum.VENDA_LEILAO});
+
+        await this.createRelatedEntity(vendaLeilaoData, item.id);
+
         return vendaLeilaoCreated;
     }
 
@@ -50,13 +52,13 @@ export class CreateVendaLeilaoUsecase implements BaseUsecaseInterface<[vendaLeil
         }
     }
 
-    private async createRelatedEntity(data: vendaLeilaoDTO): Promise<{ relationId: number; relationType: ItemRelationTypeEnum }> {
-        if (data.deckId) {
-            const deckCreated = await new CreateDeckUsecase(this.deckRepository).execute(data.deckId);
-            return { relationId: deckCreated.id, relationType: ItemRelationTypeEnum.DECK };
-        } else {
-            const cardCreated = await new CreateCardUsecase(this.cardRepository).execute(data.cardId!);
-            return { relationId: cardCreated.id, relationType: ItemRelationTypeEnum.CARD };
+    private async createRelatedEntity(data: vendaLeilaoDTO, itemId: number): Promise<void> {
+        if(data.cardId){
+            const createCardUsecase = new CreateCardUsecase(this.cardRepository);
+            await createCardUsecase.execute(data.cardId, itemId);
+        }else if (data.deckId) {
+            const createDeckUsecase = new CreateDeckUsecase(this.deckRepository);
+            await createDeckUsecase.execute(data.deckId, itemId);
         }
     }
 }

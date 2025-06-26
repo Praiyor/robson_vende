@@ -4,14 +4,14 @@ import { vendaLeilaoRepositoryInterface } from "./interface/vendaLeilaoRepositor
 
 export class vendaLeilaoRepository implements vendaLeilaoRepositoryInterface {
     constructor(){}
-    async create(vendaLeilaoData: Omit<vendaLeilao, 'id' | 'item' | 'itemId'>, iItemId: number): Promise<vendaLeilao> 
+    async create(vendaLeilaoData: Omit<vendaLeilao, 'id' | 'item' | 'itemId'>): Promise<vendaLeilao> 
     {
         const vendaCreated = await prisma.vendaLeilao.create({
             data: {
                 preco: vendaLeilaoData.preco,
                 inicio: vendaLeilaoData.inicio,
                 fim: vendaLeilaoData.fim,
-                item: { connect: { id: iItemId } },
+                status: vendaLeilaoData.status,
                 lances: 0, 
             },
         });

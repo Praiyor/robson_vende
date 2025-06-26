@@ -5,10 +5,10 @@ import { BaseUsecaseInterface } from "../interface/BaseUsecaseInterface";
 import { deckMicroservice, DeckMicroserviceDTO } from "../../controller/schema/deckSchema";
 import { deckDTO } from "../../utils/dto/deckDTO";
 
-export class CreateDeckUsecase implements BaseUsecaseInterface<[number], deck, [DeckMicroserviceDTO]>{
+export class CreateDeckUsecase implements BaseUsecaseInterface<[number, number], deck, [DeckMicroserviceDTO]>{
     constructor( private deckRepository: deckRepositoryInterface ) {}
 
-    async execute(deckId: number): Promise<deck>{
+    async execute(deckId: number, itemId: number): Promise<deck>{
         const response = await axios.get(`http://api-gateway:8080/decks/${deckId}`);
         const parseResult = deckMicroservice.safeParse(response.data);
 
@@ -23,6 +23,7 @@ export class CreateDeckUsecase implements BaseUsecaseInterface<[number], deck, [
             name: parseResult.data.name,
             description: parseResult.data.description,
             deckSize: parseResult.data.cards.length,
+            itemId: itemId
         };
 
         const deckCreated = await this.deckRepository.create(deckData);

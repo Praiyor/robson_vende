@@ -7,10 +7,10 @@ import { deckRepositoryInterface } from "../../repository/interface/deckReposito
 import { cardRepositoryInterface } from "../../repository/interface/cardRepositoryInterface";
 import { CreateDeckUsecase } from "../Deck/CreateDeckUsecase";
 import { ItemRelationTypeEnum } from "../../utils/enum/enums";
-import { CreateCardUsecase } from '../Card/CreateCardUsecase';
+import { CreateCardUsecase } from "../Card/CreateCardUsecase";
 import { CreateItemUsecase } from "../Item/CreateItemUsecase";
 
-export class CreateVendaSimplesUsecase implements BaseUsecaseInterface<[vendaSimplesDTO], vendaSimples>{
+export class UpdateVendaSimplesByIdUsecase implements BaseUsecaseInterface<[number,vendaSimplesDTO], vendaSimples>{
 
     constructor(private vendaSimplesRepository: vendaSimplesRepositoryInterface,
                 private itemRepository: itemRepositoryInterface,
@@ -18,23 +18,19 @@ export class CreateVendaSimplesUsecase implements BaseUsecaseInterface<[vendaSim
                 private cardRepository: cardRepositoryInterface
     ) {}
 
-    async execute(vendaSimplesData: vendaSimplesDTO): Promise<vendaSimples> {
-        this.validate(vendaSimplesData);
+    async execute(vendaSimplesId: number, vendaSimplesData: vendaSimplesDTO): Promise<vendaSimples> {
+        this.validate(vendaSimplesId, vendaSimplesData);
 
-        const vendaSimplesCreated = await this.vendaSimplesRepository.create({ preco: vendaSimplesData.preco, status: "A venda" });
+        const { relationId, relationType } = await this.createRelatedEntity(vendaSimplesData);
 
         const createItemUsecase = new CreateItemUsecase(this.itemRepository);
-        const item = await createItemUsecase.execute({
-                                      relationId: vendaSimplesCreated.id,
-                                      relationType: ItemRelationTypeEnum.VENDA_SIMPLES
-                                    });
+        const item = await createItemUsecase.execute({relationId, relationType});
 
-        await this.createRelatedEntity(vendaSimplesData, item.id);
-        
+        const vendaSimplesCreated = await this.vendaSimplesRepository.create({ preco: vendaSimplesData.preco });
         return vendaSimplesCreated;
     }
 
-    validate(data: vendaSimplesDTO){
+    validate(vendaSimplesId: number, data: vendaSimplesDTO){
         if (!data || !data.preco) {
             throw new Error("Invalid data provided for Venda Simples creation");
         }
@@ -48,13 +44,14 @@ export class CreateVendaSimplesUsecase implements BaseUsecaseInterface<[vendaSim
         }
     }
 
-    private async createRelatedEntity(data: vendaSimplesDTO, itemId: number): Promise<void> {
-        if(data.cardId){
-            const createCardUsecase = new CreateCardUsecase(this.cardRepository);
-            await createCardUsecase.execute(data.cardId, itemId);
-        }else if (data.deckId) {
-            const createDeckUsecase = new CreateDeckUsecase(this.deckRepository);
-            await createDeckUsecase.execute(data.deckId, itemId);
+    private async createRelatedEntity(data: vendaSimplesDTO): Promise<{ relationId: number; relationType: ItemRelationTypeEnum }> {
+        if (data.deckId) {
+            const deckCreated = await new CreateDeckUsecase(this.deckRepository).execute(data.deckId);
+            return { relationId: deckCreated.id, relationType: ItemRelationTypeEnum.DECK };
+        } else {
+            const cardCreated = await new CreateCardUsecase(this.cardRepository).execute(data.cardId!);
+            return { relationId: cardCreated.id, relationType: ItemRelationTypeEnum.CARD };
         }
     }
+    
 }

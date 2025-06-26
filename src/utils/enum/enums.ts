@@ -1,4 +1,4 @@
 export enum ItemRelationTypeEnum {
-  DECK = 'deck',
-  CARD = 'card'
+  VENDA_SIMPLES = 'vendaSimples',
+  VENDA_LEILAO = 'vendaLeilao'
 }

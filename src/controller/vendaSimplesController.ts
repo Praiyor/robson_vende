@@ -14,6 +14,7 @@ import { cardRepository } from "../repository/cardRepository";
 import { GetAllVendaSimplesUseCase } from "../usecase/VendaSimples/GetAllVendaSimplesUsecase";
 import { GetVendaSimplesByIdUseCase } from "../usecase/VendaSimples/GetVendaSimplesByIdUsecase";
 import { DeleteVendaSimplesByIdUseCase } from "../usecase/VendaSimples/DeleteVendaSimplesByIdUsecase";
+import { UpdateVendaSimplesByIdUsecase } from "../usecase/VendaSimples/UpdateVendaSimplesByIdUsecase";
 
 export class vendaSimplesController {
     constructor(){}
@@ -31,9 +32,9 @@ export class vendaSimplesController {
             const vendaData: vendaSimplesDTO = { preco, deckId, cardId };
 
             const createVenda = new CreateVendaSimplesUsecase(vendaSimplesController.getVendaSimplesRepository(),
-                                                            vendaSimplesController.getItemRepository(),
-                                                            vendaSimplesController.getDeckRepository(),
-                                                            vendaSimplesController.getCardRepository());
+                                                              vendaSimplesController.getItemRepository(),
+                                                              vendaSimplesController.getDeckRepository(),
+                                                              vendaSimplesController.getCardRepository());
 
             const createdVenda:vendaSimples = await createVenda.execute(vendaData);
 
@@ -104,7 +105,10 @@ export class vendaSimplesController {
             }
             const vendaSimplesData = parseResult.data;
 
-            const updateVendaSimplesUsecase = new UpdateVendaSimplesUsecase(vendaSimplesController.getVendaSimplesRepository());
+            const updateVendaSimplesUsecase = new UpdateVendaSimplesByIdUsecase(vendaSimplesController.getVendaSimplesRepository(),
+                                                                                vendaSimplesController.getItemRepository(),
+                                                                                vendaSimplesController.getDeckRepository(),
+                                                                                vendaSimplesController.getCardRepository());
             await updateVendaSimplesUsecase.execute(vendaSimplesId, vendaSimplesData);
 
             res.status(200).json({ message: "Venda Simples updated successfully" });

@@ -4,10 +4,10 @@ import { cardRepositoryInterface } from "../../repository/interface/cardReposito
 import { BaseUsecaseInterface } from "../interface/BaseUsecaseInterface";
 import { cardMicroservice, CardMicroserviceDTO } from "../../controller/schema/cardSchema";
 
-export class CreateCardUsecase implements BaseUsecaseInterface<[number], card, [CardMicroserviceDTO]>{
+export class CreateCardUsecase implements BaseUsecaseInterface<[number, number], card, [CardMicroserviceDTO]>{
     constructor( private cardRepository: cardRepositoryInterface ) {}
 
-    async execute(cardId: number): Promise<card>{
+    async execute(cardId: number, itemId: number): Promise<card>{
         const response = await axios.get(`http://api-gateway:8080/card/${cardId}`);
         const parseResult = cardMicroservice.safeParse(response.data);
         
@@ -17,8 +17,15 @@ export class CreateCardUsecase implements BaseUsecaseInterface<[number], card, [
 
         const cardData = parseResult.data
         await this.validate(cardData);
+        
+        const cardToCreate = {
+            id: cardData.id,
+            name: cardData.name,
+            description: cardData.description,
+            itemId: itemId
+        };
 
-        const createdCard = await this.cardRepository.create(cardData);
+        const createdCard = await this.cardRepository.create(cardToCreate);
         return createdCard;
     }
 

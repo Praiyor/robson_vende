@@ -98,7 +98,7 @@ export class vendaLeilaoController {
             }
             const vendaLeilaoData = parseResult.data;
 
-            const updateVendaLeilaoUsecase = new UpdateVendaLeilaoById(vendaLeilaoController.getVendaLeilaoRepository());
+            const updateVendaLeilaoUsecase = new UpdateVendaLeilaoByIdUsecase(vendaLeilaoController.getVendaLeilaoRepository());
             await updateVendaLeilaoUsecase.execute(vendaLeilaoId, vendaLeilaoData);
 
             res.status(200).json({ message: "Venda Leilão updated successfully" });

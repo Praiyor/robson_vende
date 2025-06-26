@@ -9,11 +9,21 @@ export class itemRepository implements itemRepositoryInterface {
     async create(dto: itemDTO): Promise<item> 
     {
         const { relationId, relationType } = dto;
+        let data: any;
 
-        const data =
-            relationType === ItemRelationTypeEnum.DECK
-                ? { deck: { connect: { id: relationId } } }
-                : { card: { connect: { id: relationId } } };
+          if (relationType === ItemRelationTypeEnum.VENDA_SIMPLES) {
+            data = {
+              vendaSimples: {
+                connect: { id: relationId }
+              }
+            };
+          } else if (relationType === ItemRelationTypeEnum.VENDA_LEILAO) {
+            data = {
+              vendaLeilao: {
+                connect: { id: relationId }
+              }
+            };
+          }
 
         return prisma.item.create({ data: data })
     }

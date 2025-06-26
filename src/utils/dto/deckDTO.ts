@@ -3,4 +3,5 @@ export interface deckDTO {
     name: string
     description: string;
     deckSize: number;
+    itemId: number;
 }

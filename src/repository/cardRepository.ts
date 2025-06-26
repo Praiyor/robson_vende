@@ -8,7 +8,12 @@ export class cardRepository implements cardRepositoryInterface
     constructor(){}
     async create(card: cardDTO): Promise<card> {
         const cardCreated = await prisma.card.create({
-            data: card
+            data: {
+                id: card.id,
+                name: card.name,
+                description: card.description,
+                item: { connect: { id: card.itemId } }
+            }
         })
 
         return cardCreated;
