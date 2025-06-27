@@ -14,9 +14,6 @@ export class CreateDeckUsecase implements BaseUsecaseInterface<[Prisma.Transacti
         const parseResult = deckMicroservice.safeParse(response.data);
 
         if(!parseResult.success){
-          console.error("⚠️ Erro no parse do deck:");
-            console.dir(parseResult.error, { depth: null }); // Mostra tudo
-            console.log("⚠️ Dados recebidos:", response.data); // Garantia dupla
             throw new Error("Invalid deck data from microservice: " + parseResult.error.errors[0].message);
         }
 
