@@ -19,7 +19,7 @@ export class UpdateVendaSimplesByIdUsecase implements BaseUsecaseInterface<[numb
     ) {}
 
     async execute(vendaSimplesId: number, vendaSimplesData: vendaSimplesDTO): Promise<vendaSimples> {
-        this.validate(vendaSimplesId, vendaSimplesData);
+        await this.validate(vendaSimplesId, vendaSimplesData);
 
         const { relationId, relationType } = await this.createRelatedEntity(vendaSimplesData);
 
@@ -30,7 +30,7 @@ export class UpdateVendaSimplesByIdUsecase implements BaseUsecaseInterface<[numb
         return vendaSimplesCreated;
     }
 
-    validate(vendaSimplesId: number, data: vendaSimplesDTO){
+    async validate(vendaSimplesId: number, data: vendaSimplesDTO){
         if (!data || !data.preco) {
             throw new Error("Invalid data provided for Venda Simples creation");
         }

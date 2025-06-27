@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../main/config/prisma";
 import { card } from "../main/generated/prisma";
 import { cardDTO } from "../utils/dto/cardDTO";
@@ -5,9 +6,19 @@ import { cardRepositoryInterface } from "./interface/cardRepositoryInterface";
 
 export class cardRepository implements cardRepositoryInterface 
 {
-    constructor(){}
-    async create(card: cardDTO): Promise<card> {
-        const cardCreated = await prisma.card.create({
+    private static instance: cardRepository;
+
+    private constructor(){}
+
+    static getInstance(): cardRepository {
+        if(!cardRepository.instance){
+            cardRepository.instance = new cardRepository();
+        }
+        return cardRepository.instance;
+    }
+    
+    async create(tx: Prisma.TransactionClient, card: cardDTO): Promise<card> {
+        const cardCreated = await tx.card.create({
             data: {
                 id: card.id,
                 name: card.name,

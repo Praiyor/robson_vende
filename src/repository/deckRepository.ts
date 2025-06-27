@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../main/config/prisma";
 import { deck } from "../main/generated/prisma";
 import { deckDTO } from "../utils/dto/deckDTO";
@@ -5,9 +6,19 @@ import { deckRepositoryInterface } from "./interface/deckRepositoryInterface";
 
 export class deckRepository implements deckRepositoryInterface 
 {
-    constructor(){}
-    async create(deck: deckDTO): Promise<deck> {
-        const deckCreated = await prisma.deck.create({
+    private static instance: deckRepository;
+
+    private constructor(){}
+
+    static getInstance(): deckRepository {
+        if(!deckRepository.instance){
+            deckRepository.instance = new deckRepository();
+        }
+        return deckRepository.instance;
+    }
+
+    async create(tx: Prisma.TransactionClient, deck: deckDTO): Promise<deck> {
+        const deckCreated = await tx.deck.create({
             data: {
                 id: deck.id,
                 name: deck.name,

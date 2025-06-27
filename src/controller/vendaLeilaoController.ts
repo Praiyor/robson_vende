@@ -108,18 +108,18 @@ export class vendaLeilaoController {
     }
 
     static getVendaLeilaoRepository(): vendaLeilaoRepositoryInterface{
-        return new vendaLeilaoRepository();
+        return vendaLeilaoRepository.getInstance();
     }
 
     static getItemRepository(): itemRepositoryInterface{
-        return new itemRepository();
+        return itemRepository.getInstance();
     }
 
     static getDeckRepository(): deckRepositoryInterface{
-        return new deckRepository();
+        return deckRepository.getInstance();
     }
 
     static getCardRepository(): cardRepositoryInterface{
-        return new cardRepository();
+        return cardRepository.getInstance();
     }
 }

@@ -6,7 +6,7 @@ export class GetVendaLeilaoByIdUseCase implements BaseUsecaseInterface<[number],
     constructor(private vendaLeilaoRepository: vendaLeilaoRepositoryInterface){}
 
     async execute(vendaLeilaoId: number): Promise<vendaLeilao | null> {
-        this.validate();
+        await this.validate();
         return await this.vendaLeilaoRepository.findById(vendaLeilaoId);
     }
 

@@ -1,7 +1,8 @@
+import { PrismaClient } from "@prisma/client";
 import { vendaLeilao } from "../../main/generated/prisma";
 
 export interface vendaLeilaoRepositoryInterface {
-    create(vendaLeilao: any): Promise<vendaLeilao>;
+    create(tx: PrismaClient, vendaLeilao: any): Promise<vendaLeilao>;
     findAll(): Promise<vendaLeilao[]>;
     findById(vendaLeilaoId: number): Promise<vendaLeilao | null>;
     deleteById(vendaLeilaoId: number): Promise<void>;

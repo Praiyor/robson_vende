@@ -4,15 +4,19 @@ import { deckRepositoryInterface } from "../../repository/interface/deckReposito
 import { BaseUsecaseInterface } from "../interface/BaseUsecaseInterface";
 import { deckMicroservice, DeckMicroserviceDTO } from "../../controller/schema/deckSchema";
 import { deckDTO } from "../../utils/dto/deckDTO";
+import { Prisma } from "@prisma/client";
 
-export class CreateDeckUsecase implements BaseUsecaseInterface<[number, number], deck, [DeckMicroserviceDTO]>{
+export class CreateDeckUsecase implements BaseUsecaseInterface<[Prisma.TransactionClient, number, number], deck, [DeckMicroserviceDTO]>{
     constructor( private deckRepository: deckRepositoryInterface ) {}
 
-    async execute(deckId: number, itemId: number): Promise<deck>{
+    async execute(tx: Prisma.TransactionClient, deckId: number, itemId: number): Promise<deck>{
         const response = await axios.get(`http://api-gateway:8080/decks/${deckId}`);
         const parseResult = deckMicroservice.safeParse(response.data);
 
         if(!parseResult.success){
+          console.error("⚠️ Erro no parse do deck:");
+            console.dir(parseResult.error, { depth: null }); // Mostra tudo
+            console.log("⚠️ Dados recebidos:", response.data); // Garantia dupla
             throw new Error("Invalid deck data from microservice: " + parseResult.error.errors[0].message);
         }
 
@@ -26,7 +30,7 @@ export class CreateDeckUsecase implements BaseUsecaseInterface<[number, number],
             itemId: itemId
         };
 
-        const deckCreated = await this.deckRepository.create(deckData);
+        const deckCreated = await this.deckRepository.create(tx, deckData);
         return deckCreated;
     }
 

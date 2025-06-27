@@ -9,6 +9,8 @@ import { CreateCardUsecase } from "../Card/CreateCardUsecase";
 import { CreateItemUsecase } from "../Item/CreateItemUsecase";
 import { vendaLeilaoRepositoryInterface } from "../../repository/interface/vendaLeilaoRepositoryInterface";
 import { vendaLeilaoDTO } from "../../utils/dto/vendaLeilaoDTO";
+import { prisma } from "../../main/config/prisma";
+import { Prisma } from "@prisma/client";
 
 export class CreateVendaLeilaoUsecase implements BaseUsecaseInterface<[vendaLeilaoDTO], vendaLeilao>{
 
@@ -19,22 +21,26 @@ export class CreateVendaLeilaoUsecase implements BaseUsecaseInterface<[vendaLeil
     ) {}
 
     async execute(vendaLeilaoData: vendaLeilaoDTO): Promise<vendaLeilao> {
-        this.validate(vendaLeilaoData);
+        await this.validate(vendaLeilaoData);
 
-        const vendaLeilaoCreated = await this.vendaLeilaoRepository.create({ inicio: vendaLeilaoData.inicio,
+        const result = await prisma.$transaction(async (tx) => {
+            const vendaLeilaoCreated = await this.vendaLeilaoRepository.create(tx, { inicio: vendaLeilaoData.inicio,
                                                                              fim: vendaLeilaoData.fim, 
                                                                              preco: vendaLeilaoData.preco,
                                                                              status: "A venda" });
 
-        const createItemUsecase = new CreateItemUsecase(this.itemRepository);
-        const item = await createItemUsecase.execute({relationId: vendaLeilaoCreated.id , relationType: ItemRelationTypeEnum.VENDA_LEILAO});
+            const createItemUsecase = new CreateItemUsecase(this.itemRepository);
+            const item = await createItemUsecase.execute(tx, {relationId: vendaLeilaoCreated.id , relationType: ItemRelationTypeEnum.VENDA_LEILAO});
 
-        await this.createRelatedEntity(vendaLeilaoData, item.id);
+            await this.createRelatedEntity(vendaLeilaoData, item.id, tx);
 
-        return vendaLeilaoCreated;
+            return vendaLeilaoCreated;
+        })
+        
+        return result;
     }
 
-    validate(data: vendaLeilaoDTO){
+    async validate(data: vendaLeilaoDTO){
         if (!data || !data.preco) {
             throw new Error("Invalid data provided for Venda Simples creation");
         }
@@ -52,13 +58,13 @@ export class CreateVendaLeilaoUsecase implements BaseUsecaseInterface<[vendaLeil
         }
     }
 
-    private async createRelatedEntity(data: vendaLeilaoDTO, itemId: number): Promise<void> {
+    private async createRelatedEntity(data: vendaLeilaoDTO, itemId: number, tx: Prisma.TransactionClient): Promise<void> {
         if(data.cardId){
             const createCardUsecase = new CreateCardUsecase(this.cardRepository);
-            await createCardUsecase.execute(data.cardId, itemId);
+            await createCardUsecase.execute(tx, data.cardId, itemId);
         }else if (data.deckId) {
             const createDeckUsecase = new CreateDeckUsecase(this.deckRepository);
-            await createDeckUsecase.execute(data.deckId, itemId);
+            await createDeckUsecase.execute(tx, data.deckId, itemId);
         }
     }
 }

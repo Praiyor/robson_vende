@@ -1,0 +1,95 @@
+### 🔹 Criar uma venda simples com deck
+POST http://localhost:9455/venda
+Content-Type: application/json
+
+{
+  "preco": 25.50,
+  "deckId": 1
+}
+
+###
+
+### 🔹 Criar uma venda simples com carta
+POST http://localhost:9455/venda
+Content-Type: application/json
+
+{
+  "preco": 19.99,
+  "cardId": 4
+}
+
+###
+
+### 🔹 Buscar todas as vendas simples
+GET http://localhost:9455/venda
+
+###
+
+### 🔹 Buscar uma venda simples por ID
+GET http://localhost:9455/venda/1
+
+###
+
+### 🔹 Atualizar uma venda simples (apenas preco)
+PUT http://localhost:9455/venda/1
+Content-Type: application/json
+
+{
+  "preco": 29.99
+}
+
+###
+
+### 🔹 Deletar uma venda simples
+DELETE http://localhost:9455/venda/1
+
+###
+
+### 🔸 Criar uma venda por leilão com deck
+POST http://localhost:9455/leilao
+Content-Type: application/json
+
+{
+  "preco": 100.00,
+  "inicio": "2025-07-01T12:00:00.000Z",
+  "fim": "2025-07-03T12:00:00.000Z",
+  "deckId": 2
+}
+
+###
+
+### 🔸 Criar uma venda por leilão com carta
+POST http://localhost:9455/leilao
+Content-Type: application/json
+
+{
+  "preco": 200.00,
+  "inicio": "2025-07-05T14:00:00.000Z",
+  "fim": "2025-07-10T14:00:00.000Z",
+  "cardId": 4
+}
+
+###
+
+### 🔸 Buscar todas as vendas por leilão
+GET http://localhost:9455/leilao
+
+###
+
+### 🔸 Buscar uma venda por leilão por ID
+GET http://localhost:9455/leilao/3
+
+###
+
+### 🔸 Atualizar uma venda por leilão (apenas preco)
+PUT http://localhost:9455/leilao/1
+Content-Type: application/json
+
+{
+  "preco": 250.00
+}
+
+###
+
+### 🔸 Deletar uma venda por leilão
+DELETE http://localhost:9455/leilao/1

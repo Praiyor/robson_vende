@@ -1,12 +1,23 @@
 import { vendaSimples } from "../main/generated/prisma";
 import { vendaSimplesRepositoryInterface } from "./interface/vendaSimplesRepositoryInterface";
 import { prisma } from "../main/config/prisma";
+import { PrismaClient } from "@prisma/client";
 
 export class vendaSimplesRepository implements vendaSimplesRepositoryInterface {
-    constructor(){}
-    async create(vendaSimplesData: Omit<vendaSimples, 'id' | 'item' | 'itemId'>): Promise<vendaSimples> 
+    private static instance: vendaSimplesRepository;
+
+    private constructor(){}
+
+    static getInstance(): vendaSimplesRepository {
+        if(!vendaSimplesRepository.instance){
+            vendaSimplesRepository.instance = new vendaSimplesRepository();
+        }
+        return vendaSimplesRepository.instance;
+    }
+
+    async create(tx: PrismaClient, vendaSimplesData: Omit<vendaSimples, 'id' | 'item' | 'itemId'>): Promise<vendaSimples> 
     {
-        const vendaCreated = await prisma.vendaSimples.create({
+        const vendaCreated = await tx.vendaSimples.create({
             data: {
                 preco: vendaSimplesData.preco,
                 status: vendaSimplesData.status

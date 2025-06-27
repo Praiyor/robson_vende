@@ -1,3 +1,4 @@
+import { PrismaClient } from "@prisma/client";
 import { prisma } from "../main/config/prisma";
 import { item } from "../main/generated/prisma";
 import { itemDTO } from "../utils/dto/itemDTO";
@@ -5,8 +6,18 @@ import { ItemRelationTypeEnum } from "../utils/enum/enums";
 import { itemRepositoryInterface } from "./interface/itemRepositoryInterface";
 
 export class itemRepository implements itemRepositoryInterface {
-    constructor(){}
-    async create(dto: itemDTO): Promise<item> 
+    private static instance: itemRepository;
+
+    private constructor(){}
+
+    static getInstance(): itemRepository {
+        if(!itemRepository.instance){
+            itemRepository.instance = new itemRepository();
+        }
+        return itemRepository.instance;
+    }
+    
+    async create(tx: PrismaClient, dto: itemDTO): Promise<item> 
     {
         const { relationId, relationType } = dto;
         let data: any;
@@ -25,7 +36,7 @@ export class itemRepository implements itemRepositoryInterface {
             };
           }
 
-        return prisma.item.create({ data: data })
+        return tx.item.create({ data: data })
     }
 
     async findAll(): Promise<item[]> 

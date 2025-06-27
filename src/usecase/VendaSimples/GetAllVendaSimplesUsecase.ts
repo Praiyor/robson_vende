@@ -6,7 +6,7 @@ export class GetAllVendaSimplesUseCase implements BaseUsecaseInterface<[], venda
     constructor(private vendaSimplesRepository: vendaSimplesRepositoryInterface){}
 
     async execute(): Promise<vendaSimples[]> {
-        this.validate();
+        await this.validate();
         return await this.vendaSimplesRepository.findAll();
     }
 

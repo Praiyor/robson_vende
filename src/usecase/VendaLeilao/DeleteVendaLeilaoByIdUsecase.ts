@@ -6,7 +6,7 @@ export class DeleteVendaLeilaoByIdUseCase implements BaseUsecaseInterface<[numbe
     constructor(private vendaLeilaoRepository: vendaLeilaoRepositoryInterface){}
 
     async execute(vendaLeilaoId: number): Promise<void> {
-        this.validate(vendaLeilaoId);
+        await this.validate(vendaLeilaoId);
         await this.vendaLeilaoRepository.deleteById(vendaLeilaoId);
     }
 

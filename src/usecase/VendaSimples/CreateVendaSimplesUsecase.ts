@@ -9,6 +9,8 @@ import { CreateDeckUsecase } from "../Deck/CreateDeckUsecase";
 import { ItemRelationTypeEnum } from "../../utils/enum/enums";
 import { CreateCardUsecase } from '../Card/CreateCardUsecase';
 import { CreateItemUsecase } from "../Item/CreateItemUsecase";
+import { prisma } from "../../main/config/prisma";
+import { Prisma } from "@prisma/client";
 
 export class CreateVendaSimplesUsecase implements BaseUsecaseInterface<[vendaSimplesDTO], vendaSimples>{
 
@@ -19,22 +21,26 @@ export class CreateVendaSimplesUsecase implements BaseUsecaseInterface<[vendaSim
     ) {}
 
     async execute(vendaSimplesData: vendaSimplesDTO): Promise<vendaSimples> {
-        this.validate(vendaSimplesData);
+        await this.validate(vendaSimplesData);
 
-        const vendaSimplesCreated = await this.vendaSimplesRepository.create({ preco: vendaSimplesData.preco, status: "A venda" });
+        const result = await prisma.$transaction(async (tx) => {
+            const vendaSimplesCreated = await this.vendaSimplesRepository.create(tx, { preco: vendaSimplesData.preco, status: "A venda" });
 
-        const createItemUsecase = new CreateItemUsecase(this.itemRepository);
-        const item = await createItemUsecase.execute({
-                                      relationId: vendaSimplesCreated.id,
-                                      relationType: ItemRelationTypeEnum.VENDA_SIMPLES
-                                    });
+            const createItemUsecase = new CreateItemUsecase(this.itemRepository);
+            const item = await createItemUsecase.execute(tx, {
+                                          relationId: vendaSimplesCreated.id,
+                                          relationType: ItemRelationTypeEnum.VENDA_SIMPLES
+                                        });
 
-        await this.createRelatedEntity(vendaSimplesData, item.id);
-        
-        return vendaSimplesCreated;
+            await this.createRelatedEntity(vendaSimplesData, item.id, tx);
+                                    
+            return vendaSimplesCreated;
+        })
+
+        return result;
     }
 
-    validate(data: vendaSimplesDTO){
+    async validate(data: vendaSimplesDTO){
         if (!data || !data.preco) {
             throw new Error("Invalid data provided for Venda Simples creation");
         }
@@ -48,13 +54,13 @@ export class CreateVendaSimplesUsecase implements BaseUsecaseInterface<[vendaSim
         }
     }
 
-    private async createRelatedEntity(data: vendaSimplesDTO, itemId: number): Promise<void> {
+    private async createRelatedEntity(data: vendaSimplesDTO, itemId: number, tx: Prisma.TransactionClient): Promise<void> {
         if(data.cardId){
             const createCardUsecase = new CreateCardUsecase(this.cardRepository);
-            await createCardUsecase.execute(data.cardId, itemId);
+            await createCardUsecase.execute(tx, data.cardId, itemId);
         }else if (data.deckId) {
             const createDeckUsecase = new CreateDeckUsecase(this.deckRepository);
-            await createDeckUsecase.execute(data.deckId, itemId);
+            await createDeckUsecase.execute(tx, data.deckId, itemId);
         }
     }
 }

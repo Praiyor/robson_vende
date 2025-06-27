@@ -1,12 +1,23 @@
+import { PrismaClient } from "@prisma/client";
 import { prisma } from "../main/config/prisma";
 import { vendaLeilao } from "../main/generated/prisma";
 import { vendaLeilaoRepositoryInterface } from "./interface/vendaLeilaoRepositoryInterface";
 
 export class vendaLeilaoRepository implements vendaLeilaoRepositoryInterface {
-    constructor(){}
-    async create(vendaLeilaoData: Omit<vendaLeilao, 'id' | 'item' | 'itemId'>): Promise<vendaLeilao> 
+    private static instance: vendaLeilaoRepository;
+
+    private constructor(){}
+
+    static getInstance(): vendaLeilaoRepository {
+        if(!vendaLeilaoRepository.instance){
+            vendaLeilaoRepository.instance = new vendaLeilaoRepository();
+        }
+        return vendaLeilaoRepository.instance;
+    }
+
+    async create(tx: PrismaClient, vendaLeilaoData: Omit<vendaLeilao, 'id' | 'item' | 'itemId'>): Promise<vendaLeilao> 
     {
-        const vendaCreated = await prisma.vendaLeilao.create({
+        const vendaCreated = await tx.vendaLeilao.create({
             data: {
                 preco: vendaLeilaoData.preco,
                 inicio: vendaLeilaoData.inicio,

@@ -3,8 +3,8 @@ import { z } from "zod";
 // base
 const baseVendaLeilaoSchema = z.object({
   preco: z.number().min(0, "The minimum price must be 0"),
-  inicio: z.date(),
-  fim: z.date(),
+  inicio: z.preprocess((val) => new Date(val as string), z.date()),
+  fim: z.preprocess((val) => new Date(val as string), z.date()),
   deckId: z.number().int().positive().optional(),
   cardId: z.number().int().positive().optional(),
 });

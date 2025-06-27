@@ -10,7 +10,7 @@ export const cardMicroservice = z.object({
     price: z.number().nonnegative(),
     createdAt: z.coerce.date(),
     power: z.string().optional(),
-    imageUrl: z.string().url(),
+    imageUrl: z.string(),
 })
 
 export type CardMicroserviceDTO = z.infer<typeof cardMicroservice>;

@@ -3,11 +3,12 @@ import { card } from "../../main/generated/prisma";
 import { cardRepositoryInterface } from "../../repository/interface/cardRepositoryInterface";
 import { BaseUsecaseInterface } from "../interface/BaseUsecaseInterface";
 import { cardMicroservice, CardMicroserviceDTO } from "../../controller/schema/cardSchema";
+import { Prisma } from "@prisma/client";
 
-export class CreateCardUsecase implements BaseUsecaseInterface<[number, number], card, [CardMicroserviceDTO]>{
+export class CreateCardUsecase implements BaseUsecaseInterface<[Prisma.TransactionClient, number, number], card, [CardMicroserviceDTO]>{
     constructor( private cardRepository: cardRepositoryInterface ) {}
 
-    async execute(cardId: number, itemId: number): Promise<card>{
+    async execute(tx: Prisma.TransactionClient, cardId: number, itemId: number): Promise<card>{
         const response = await axios.get(`http://api-gateway:8080/card/${cardId}`);
         const parseResult = cardMicroservice.safeParse(response.data);
         
@@ -25,7 +26,7 @@ export class CreateCardUsecase implements BaseUsecaseInterface<[number, number],
             itemId: itemId
         };
 
-        const createdCard = await this.cardRepository.create(cardToCreate);
+        const createdCard = await this.cardRepository.create(tx, cardToCreate);
         return createdCard;
     }
 
@@ -34,11 +35,12 @@ export class CreateCardUsecase implements BaseUsecaseInterface<[number, number],
           throw new Error("Card price must be non-negative.");
         }
 
-        if (!["creature", "spell", "land", "artifact"].includes(cardData.type.toLowerCase())) {
+        const allowedTypes = ["criatura", "feitiço", "terreno", "artefato", "encantamento", "magia instantânea"];
+        if (!allowedTypes.includes(cardData.type.toLowerCase())) {
           throw new Error("Invalid card type: " + cardData.type);
         }
     
-        const allowedColors = ["white", "blue", "black", "red", "green", "colorless"];
+        const allowedColors = ["branco", "azul", "preto", "verde", "vermelho", "incolor"];
         if (!allowedColors.includes(cardData.color.toLowerCase())) {
           throw new Error("Invalid card color: " + cardData.color);
         }

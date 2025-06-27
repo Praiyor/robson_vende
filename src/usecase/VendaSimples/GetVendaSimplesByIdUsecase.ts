@@ -6,7 +6,7 @@ export class GetVendaSimplesByIdUseCase implements BaseUsecaseInterface<[number]
     constructor(private vendaSimplesRepository: vendaSimplesRepositoryInterface){}
 
     async execute(vendaSimplesId: number): Promise<vendaSimples | null> {
-        this.validate();
+        await this.validate();
         return await this.vendaSimplesRepository.findById(vendaSimplesId);
     }
 

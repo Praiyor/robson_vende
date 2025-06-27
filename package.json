@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/main/server.ts"
+    "dev": "tsx watch --clear-screen=false src/main/server.ts"
   },
   "keywords": [],
   "author": "",

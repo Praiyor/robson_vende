@@ -5,8 +5,8 @@ export const deckMicroservice = z.object({
     name: z.string(),
     description: z.string().optional(),
     format: z.string(),
-    minCards: z.number().optional(),
-    exactCards: z.number().optional(),
+    minCards: z.number().optional().nullable(),
+    exactCards: z.number().optional().nullable(),
     createdAt: z.coerce.date(),
     updatedAt: z.coerce.date(),
     cards: z.array(z.object({
