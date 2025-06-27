@@ -1,5 +1,5 @@
 ### 🔹 Criar uma venda simples com deck
-POST http://localhost:9455/venda
+POST http://localhost:8080/venda
 Content-Type: application/json
 
 {
@@ -10,7 +10,7 @@ Content-Type: application/json
 ###
 
 ### 🔹 Criar uma venda simples com carta
-POST http://localhost:9455/venda
+POST http://localhost:8080/venda
 Content-Type: application/json
 
 {
@@ -21,17 +21,17 @@ Content-Type: application/json
 ###
 
 ### 🔹 Buscar todas as vendas simples
-GET http://localhost:9455/venda
+GET http://localhost:8080/venda
 
 ###
 
 ### 🔹 Buscar uma venda simples por ID
-GET http://localhost:9455/venda/1
+GET http://localhost:8080/venda/1
 
 ###
 
 ### 🔹 Atualizar uma venda simples (apenas preco)
-PUT http://localhost:9455/venda/1
+PUT http://localhost:8080/venda/1
 Content-Type: application/json
 
 {
@@ -41,12 +41,12 @@ Content-Type: application/json
 ###
 
 ### 🔹 Deletar uma venda simples
-DELETE http://localhost:9455/venda/1
+DELETE http://localhost:8080/venda/1
 
 ###
 
 ### 🔸 Criar uma venda por leilão com deck
-POST http://localhost:9455/leilao
+POST http://localhost:8080/leilao
 Content-Type: application/json
 
 {
@@ -59,7 +59,7 @@ Content-Type: application/json
 ###
 
 ### 🔸 Criar uma venda por leilão com carta
-POST http://localhost:9455/leilao
+POST http://localhost:8080/leilao
 Content-Type: application/json
 
 {
@@ -72,17 +72,17 @@ Content-Type: application/json
 ###
 
 ### 🔸 Buscar todas as vendas por leilão
-GET http://localhost:9455/leilao
+GET http://localhost:8080/leilao
 
 ###
 
 ### 🔸 Buscar uma venda por leilão por ID
-GET http://localhost:9455/leilao/3
+GET http://localhost:8080/leilao/3
 
 ###
 
 ### 🔸 Atualizar uma venda por leilão (apenas preco)
-PUT http://localhost:9455/leilao/1
+PUT http://localhost:8080/leilao/1
 Content-Type: application/json
 
 {
@@ -92,4 +92,4 @@ Content-Type: application/json
 ###
 
 ### 🔸 Deletar uma venda por leilão
-DELETE http://localhost:9455/leilao/1
+DELETE http://localhost:8080/leilao/1
