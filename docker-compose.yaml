@@ -1,0 +1,91 @@
+services:
+  postgres_cards:
+    image: postgres:15
+    container_name: postgres_cards_container
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: pryor
+      POSTGRES_PASSWORD: robson
+      POSTGRES_DB: robson_cards
+    volumes:
+      - pgdata_cards:/var/lib/postgresql/data
+
+  postgres_decks:
+    image: postgres:15
+    container_name: postgres_decks_container
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: pryor
+      POSTGRES_PASSWORD: robson
+      POSTGRES_DB: robsonDeck
+    volumes:
+      - pgdata_decks:/var/lib/postgresql/data
+
+  postgres_venda:
+    image: postgres:15
+    container_name: postgres_venda_container
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: pryor
+      POSTGRES_PASSWORD: robson
+      POSTGRES_DB: robsonVende
+    volumes:
+      - pgdata_venda:/var/lib/postgresql/data
+
+  card-service:
+    build: ./Robson_Cards
+    container_name: card-service
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./Robson_Cards:/app
+    depends_on:
+      - postgres_cards
+    environment:
+      DATABASE_URL: postgres://pryor:robson@postgres_cards:5432/robson_cards
+    command: >
+      sh -c "npx prisma migrate deploy && npm run start"
+
+  decks-service:
+    build: ./robson-deck
+    container_name: decks-service
+    ports:
+      - "4052:4052"
+    depends_on:
+      - postgres_decks
+    environment:
+      DATABASE_URL: postgres://pryor:robson@postgres_decks:5432/robsonDeck
+    command: >
+      sh -c "npx prisma migrate deploy && npm run dev"
+
+  venda-service:
+    build: ./robson-vende
+    container_name: venda-service
+    ports:
+      - "9455:9455"
+    depends_on:
+      - postgres_venda
+    environment:
+      DATABASE_URL: postgres://pryor:robson@postgres_venda:5432/robsonVende
+    command: >
+      sh -c "npx prisma migrate deploy && npm run dev"
+
+  gateway:
+    build: ./robson_apiGateway/robson-apigateway
+    container_name: api-gateway
+    depends_on:
+      - card-service
+      - decks-service
+    ports:
+      - "8080:8080"
+      - "9876:9876"
+    volumes:
+      - ./robson_apiGateway/robson-apigateway:/app
+
+volumes:
+  pgdata_cards:
+  pgdata_decks:
+  pgdata_venda:
